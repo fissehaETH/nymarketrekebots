@@ -1,7 +1,7 @@
 (function () {
     "use strict";
   
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycby41miqAxuzkzTKgQQ4ahSkq0F2iYX9qTKNSeFRYy0LrtRI2PUElofbeZSheN2iJNc6/exec';
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx_88xSjSiyhs6UeDbLpYY_k-kWmwSVvfdUUHDpZTS5hhB83FxY8nFUG1pyxdStQ5Ir/exec';
   
     const formsToTrack = [
       { id: 'myForm', sheetName: 'order' }, 
