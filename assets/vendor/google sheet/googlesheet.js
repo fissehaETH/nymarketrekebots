@@ -1,12 +1,32 @@
 (function () {
     "use strict";
   
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbz7oADZAoLSXtgGxfr3-8klPmQBxcuQcne9dncpQWIp-r3uWN4yfmUWfQ_dT6MmT9Wl/exec';
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbxs7IAC33PXZ6xEXVibnnAUF_3Fpb7FMvGjzO5PMPBFR2UdxwYqzZvnJsE1DGFRVzLb/exec';
   
     const formsToTrack = [
       { id: 'myForm', sheetName: 'order' }, 
       { id: 'myForm2', sheetName: 'message' }
     ];
+  
+    // Variables to store user's location
+    let userLatitude = '';
+    let userLongitude = '';
+  
+    // Get location on page load
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        function(position) {
+          userLatitude = position.coords.latitude;
+          userLongitude = position.coords.longitude;
+          console.log("User location captured:", userLatitude, userLongitude);
+        },
+        function(error) {
+          console.error("Error getting location: ", error);
+        }
+      );
+    } else {
+      console.log("Geolocation is not supported by this browser.");
+    }
   
     formsToTrack.forEach(item => {
       const form = document.getElementById(item.id);
@@ -24,6 +44,11 @@
           let formData = new FormData(thisForm);
           formData.append('targetSheet', item.sheetName);
   
+          // Add location captured on page load
+          formData.append('latitude', userLatitude);
+          formData.append('longitude', userLongitude);
+  
+          // Send the data
           sendToGoogleSheet(thisForm, formData);
         });
   
