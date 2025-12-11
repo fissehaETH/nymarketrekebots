@@ -1,75 +1,73 @@
-
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycby_ktgKadzPqHgHQhFInK9MDMt-oKadJXCqSKfrpATMOpNGLlEC3P7IkBnZ_aATH0SB/exec';
-
-    // List forms with their Google Sheet target names
+(function () {
+    "use strict";
+  
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycby41miqAxuzkzTKgQQ4ahSkq0F2iYX9qTKNSeFRYy0LrtRI2PUElofbeZSheN2iJNc6/exec';
+  
     const formsToTrack = [
-        { id: 'myForm', sheetName: 'order' }, 
-        { id: 'myForm2', sheetName: 'message' }
+      { id: 'myForm', sheetName: 'order' }, 
+      { id: 'myForm2', sheetName: 'message' }
     ];
-
-    function handleFormSubmission(formElement, targetSheetName) {
-
-        // UI elements
-        const loadingDiv = formElement.querySelector('.loading');
-        const errorMessageDiv = formElement.querySelector('.error-message');
-        const sentMessageDiv = formElement.querySelector('.sent-message');
-
-        // Reset UI state
-        if (loadingDiv) loadingDiv.style.display = 'block';
-        if (errorMessageDiv) errorMessageDiv.style.display = 'none';
-        if (sentMessageDiv) sentMessageDiv.style.display = 'none';
-
-        // Prepare form data
-        const formData = new FormData(formElement);
-        formData.append('targetSheet', targetSheetName); // IMPORTANT
-        const urlEncodedData = new URLSearchParams(formData).toString();
-
-        // Send POST request
-        fetch(WEB_APP_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: urlEncodedData
-        })
-        .then(response => response.text())
-        .then(data => {
-            if (loadingDiv) loadingDiv.style.display = 'none';
-
-            if (data.includes('Success')) {
-                if (sentMessageDiv) sentMessageDiv.style.display = 'block';
-                formElement.reset();
-            } else {
-                if (errorMessageDiv) {
-                    errorMessageDiv.style.display = 'block';
-                    errorMessageDiv.textContent = 'Server Error: ' + data;
-                }
-            }
-        })
-        .catch(error => {
-            if (loadingDiv) loadingDiv.style.display = 'none';
-            if (errorMessageDiv) {
-                errorMessageDiv.style.display = 'block';
-                errorMessageDiv.textContent = 'Network Error: Submission failed.';
-            }
-            console.error('Submission Error:', error);
-        });
-    }
-
-    // Initialize all forms
+  
     formsToTrack.forEach(item => {
-        const form = document.getElementById(item.id);
-
-        if (form) {
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                handleFormSubmission(form, item.sheetName);
-            });
-
-            // Hide status messages initially
-            const loadingDiv = form.querySelector('.loading');
-            const errorMessageDiv = form.querySelector('.error-message');
-            const sentMessageDiv = form.querySelector('.sent-message');
-            if (loadingDiv) loadingDiv.style.display = 'none';
-            if (errorMessageDiv) errorMessageDiv.style.display = 'none';
-            if (sentMessageDiv) sentMessageDiv.style.display = 'none';
-        }
+      const form = document.getElementById(item.id);
+  
+      if (form) {
+        form.addEventListener('submit', function(event) {
+          event.preventDefault();
+  
+          const thisForm = form;
+  
+          thisForm.querySelector('.loading').classList.add('d-block');
+          thisForm.querySelector('.error-message').classList.remove('d-block');
+          thisForm.querySelector('.sent-message').classList.remove('d-block');
+  
+          let formData = new FormData(thisForm);
+          formData.append('targetSheet', item.sheetName);
+  
+          sendToGoogleSheet(thisForm, formData);
+        });
+  
+        // Hide all messages on load
+        const loading = form.querySelector('.loading');
+        const error = form.querySelector('.error-message');
+        const sent = form.querySelector('.sent-message');
+  
+        if (loading) loading.classList.remove('d-block');
+        if (error) error.classList.remove('d-block');
+        if (sent) sent.classList.remove('d-block');
+      }
     });
+  
+    function sendToGoogleSheet(thisForm, formData) {
+      fetch(WEB_APP_URL, {
+        method: 'POST',
+        body: new URLSearchParams(formData),
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      })
+      .then(res => res.text())
+      .then(data => {
+        thisForm.querySelector('.loading').classList.remove('d-block');
+  
+        if (data.includes("Success")) {
+          thisForm.querySelector('.sent-message').classList.add('d-block');
+          thisForm.reset();
+        } else {
+          displayError(thisForm, "Server Error: " + data);
+        }
+      })
+      .catch(err => {
+        displayError(thisForm, "Network Error: Submission failed.");
+        console.error(err);
+      });
+    }
+  
+    function displayError(thisForm, error) {
+      thisForm.querySelector('.loading').classList.remove('d-block');
+      thisForm.querySelector('.error-message').innerHTML = error;
+      thisForm.querySelector('.error-message').classList.add('d-block');
+    }
+  
+  })();
+  
