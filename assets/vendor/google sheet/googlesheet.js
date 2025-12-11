@@ -1,7 +1,7 @@
 (function () {
     "use strict";
   
-    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx_88xSjSiyhs6UeDbLpYY_k-kWmwSVvfdUUHDpZTS5hhB83FxY8nFUG1pyxdStQ5Ir/exec';
+    const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbz7oADZAoLSXtgGxfr3-8klPmQBxcuQcne9dncpQWIp-r3uWN4yfmUWfQ_dT6MmT9Wl/exec';
   
     const formsToTrack = [
       { id: 'myForm', sheetName: 'order' }, 
@@ -71,3 +71,4 @@
   
   })();
   
+
